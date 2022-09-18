@@ -8,14 +8,14 @@ function getPointShadowAfterRotate(pointX, pointY, hPointX, hPointY, rad) {
 
 //
 class CircleContainer {
-    constructor(posX, posY, r) {
+    constructor(posX, posY, r, clockwise) {
         this.posX = posX;
         this.posY = posY;
         this.r = r;
+        this.setDefaultClockwise(clockwise);
         this.setCircularArcLength(0.25);
         this.setAnimationTime(300);
         this.setAnimationStep(30);
-        this.setClockwise(true);
         this.setCircleImagesPoint();
         this.setListCircle();
         this.timeStep = this.time / this.step;
@@ -27,10 +27,9 @@ class CircleContainer {
             posX: this.posX - this.r,
             posY: this.posY
         };
-
-        this.topPoint = this.pointAfterRotate(this.mainPoint, Math.PI / 6);
-        this.bottomPoint = this.pointAfterRotate(this.mainPoint, - Math.PI / 6);
-        this.hiddenPoint = this.pointAfterRotate(this.mainPoint, Math.PI / 3);
+        this.topPoint = this.pointAfterRotate(this.mainPoint, - Math.PI / 6);
+        this.bottomPoint = this.pointAfterRotate(this.mainPoint,  Math.PI / 6);
+        this.hiddenPoint = this.pointAfterRotate(this.mainPoint, - Math.PI / 3);
     }
 
     setListCircle() {
@@ -64,7 +63,10 @@ class CircleContainer {
     setCircularArcLength(distance) {
         this.circularArcLength = distance;
     }
-
+    setDefaultClockwise(isClockwise) {
+        this.defaultClockwise = isClockwise;
+        this.setClockwise(isClockwise);
+    }
     setClockwise(isClockwise) {
         this.clockwise = isClockwise ? 1 : -1;
     }
@@ -82,6 +84,8 @@ class CircleContainer {
         this.timeStep = this.time / this.step;
     }
     pointAfterRotate(point, rad) {
+        console.log(this.clockwise, rad);
+
         rad = this.clockwise * rad;
         return {
             posX: (point.posX - this.posX) * Math.cos(rad) - (point.posY - this.posY) * Math.sin(rad) + this.posX,
@@ -111,6 +115,14 @@ class CircleContainer {
     setListImageUrl (listImagesUrl) {
         this.listImagesUrl = [];
     }
+    changeImageStep(step) {
+        this.imageStep = step;
+        if(step < 0) {
+            this.setClockwise(!this.defaultClockwise);
+        }
+        this.setClockwise(this.defaultClockwise);
+    }
+    
 
     startAnimation() {
         this.setImagesPointsForAnimation();
@@ -175,8 +187,7 @@ class CircleImage {
 
 }
 
-let circleContainer = new CircleContainer(500, 400, 400);
-circleContainer.setClockwise(false);
+let circleContainer = new CircleContainer(500, 400, 400, true);
 circleContainer.setAnimationTime(3000);
 circleContainer.setAnimationStep(300);
 circleContainer.setCircularArcLength(0.08333333334);

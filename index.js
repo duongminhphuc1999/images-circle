@@ -8,15 +8,16 @@ function getPointShadowAfterRotate(pointX, pointY, hPointX, hPointY, rad) {
 
 //
 class CircleContainer {
-    constructor(posX, posY, r, clockwise, listImagesUrl) {
+    constructor(posX, posY, r, clockwise, listImagesUrl, circularArcLength) {
         this.posX = posX;
         this.posY = posY;
         this.r = r;
         this.setListImageUrl(listImagesUrl);
         this.setDefaultClockwise(clockwise);
         this.setCircularArcLength(0.25);
-        this.setAnimationTime(300);
-        this.setAnimationStep(30);
+        this.setDefaultAnimationTime(300);
+        this.setDefaultAnimationStep(30);
+        this.setCircularArcLength(circularArcLength);
         this.setCircleImagesPoint();
         this.setListCircle();
         this.timeStep = this.time / this.step;
@@ -34,13 +35,14 @@ class CircleContainer {
             posX: this.posX - this.r,
             posY: this.posY
         };
-        this.topPoint = this.pointAfterRotate(this.mainPoint, - Math.PI / 6);
-        this.bottomPoint = this.pointAfterRotate(this.mainPoint, Math.PI / 6);
-        this.hiddenPoint = this.pointAfterRotate(this.mainPoint, - Math.PI / 3);
-        this.hiddenBottomPoint = this.pointAfterRotate(this.mainPoint, Math.PI / 3);
+        let rad = this.convertCircularArcLengthToRad(this.circularArcLength);
+        this.topPoint = this.pointAfterRotate(this.mainPoint, - rad);
+        this.bottomPoint = this.pointAfterRotate(this.mainPoint, rad);
+        this.hiddenPoint = this.pointAfterRotate(this.mainPoint, - 2 * rad);
+        this.hiddenBottomPoint = this.pointAfterRotate(this.mainPoint,2* rad);
     }
     setListCircle() {
-
+       
         this.circle1 = new CircleImage('.circle.circle-1', this.hiddenPoint.posX, this.hiddenPoint.posY, 50, this.listImagesUrl[3]);
         this.circle2 = new CircleImage('.circle.circle-2', this.topPoint.posX, this.topPoint.posY, 50, this.listImagesUrl[0]);
         this.circle3 = new CircleImage('.circle.circle-3', this.mainPoint.posX, this.mainPoint.posY, 50, this.listImagesUrl[1]);
@@ -81,12 +83,18 @@ class CircleContainer {
     setClockwise(isClockwise) {
         this.clockwise = isClockwise ? 1 : -1;
     }
-
+    setDefaultAnimationTime(time) {
+        this.defaultTime = time;
+        this.setAnimationTime(time);
+    }
     setAnimationTime(time) {
         this.time = time;
         this.setTimeOfAnimationStep();
     }
-
+    setDefaultAnimationStep(step) {
+        this.defaultStep = step;
+        this.setAnimationStep(step);
+    }
     setAnimationStep(step) {
         this.step = step;
         this.setTimeOfAnimationStep();
@@ -122,11 +130,15 @@ class CircleContainer {
         this.listCircleImage = this.listCircleImage.map(function (image, index) {
             return {
                 circle: image.circle,
-                listPoint: this.listPointAfterRotate(image.circle.getPoint(), this.circularArcLength * 2 * Math.PI),
+                listPoint: this.listPointAfterRotate(image.circle.getPoint(), this.convertCircularArcLengthToRad(this.circularArcLength)),
                 imagePositionInList: image.imagePositionInList
             }
         }.bind(this));
 
+    }
+
+    convertCircularArcLengthToRad(circularArcLength) {
+        return circularArcLength * 2 * Math.PI;
     }
     setMainImagePos() {
 
@@ -198,6 +210,24 @@ class CircleContainer {
         }.bind(this), this.timeStep);
 
     }
+    rotateNAnimation(number) {
+        let numberAbs = Math.abs(number);
+        let isClockwise = number/numberAbs == -1 ? false : true;
+        this.setDefaultClockwise(isClockwise);
+        this.setAnimationTime(this.defaultTime/numberAbs);
+        this.setAnimationStep(this.defaultStep/numberAbs);
+
+        this.startAnimation();
+        if(numberAbs == 1) {
+            return 0;
+        }
+        console.log(numberAbs);
+        for(let i = 2; i <= numberAbs; i++) {
+            setTimeout(function() {
+                this.startAnimation();
+            }.bind(this), (i - 1) * this.time);
+        } 
+    }
 }
 class CircleImage {
     constructor(selector, posX, posY, r, imageUrl) {
@@ -243,10 +273,10 @@ let listImagesUrl = [
     'https://media.wired.com/photos/5cdefb92b86e041493d389df/1:1/w_988,h_988,c_limit/Culture-Grumpy-Cat-487386121.jpg',
     'https://static01.nyt.com/images/2019/10/01/science/00SCI-CATS1/00SCI-CATS1-facebookJumbo.jpg?year=2019&h=549&w=1050&s=a12758d1b750010957f6d8dcafd0fb707ac2f98675c4cd264adc01b93205d41e&k=ZQJBKqZ0VN'
 ];
-let circleContainer = new CircleContainer(500, 400, 400, false, listImagesUrl);
-circleContainer.setAnimationTime(500);
-circleContainer.setAnimationStep(300);
-circleContainer.setCircularArcLength(0.08333333334);
+let circleContainer = new CircleContainer(500, 400, 400, false, listImagesUrl, 0.125);
+circleContainer.setDefaultAnimationTime(500);
+circleContainer.setDefaultAnimationStep(100);
+
 
 const nextBtn = document.getElementById('qqbtn');
 const prevBtn = document.getElementById('qqjztrbtn');
@@ -254,15 +284,13 @@ const prevBtn = document.getElementById('qqjztrbtn');
 
 nextBtn.addEventListener('click', function () {
     if (!circleContainer.inAnimation) {
-        circleContainer.setDefaultClockwise(false)
-        circleContainer.startAnimation();
+        circleContainer.rotateNAnimation(-1);
     }
 });
 
 prevBtn.addEventListener('click', function () {
     if (!circleContainer.inAnimation) {
-        circleContainer.setDefaultClockwise(true)
-        circleContainer.startAnimation();
+        circleContainer.rotateNAnimation(1);
     }
 });
 

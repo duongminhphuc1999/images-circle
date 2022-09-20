@@ -1,28 +1,24 @@
-//
-function getPointShadowAfterRotate(pointX, pointY, hPointX, hPointY, rad) {
-    return {
-        posX: (pointX - hPointX) * Math.cos(rad) - (this.posY - pointY) * Math.sin(rad) + hPointY,
-        posY: (pointX - hPointX) * Math.sin(rad) - (this.posY - pointY) * Math.cos(rad) + hPointY
-    };
-}
-
-//
 class CircleContainer {
-    constructor(posX, posY, r, clockwise, listImagesUrl, circularArcLength) {
+
+    defaultTime = 500;
+    defaultStep = 80;
+    inAnimation = false;
+    clockwise = - 1;
+    defaultClockwise = -1;
+    circularArcLength = 0.125;
+
+    constructor(posX, posY, r) {
         this.posX = posX;
         this.posY = posY;
         this.r = r;
-        this.setListImageUrl(listImagesUrl);
-        this.setDefaultClockwise(clockwise);
-        this.setCircularArcLength(0.25);
-        this.setDefaultAnimationTime(300);
-        this.setDefaultAnimationStep(30);
-        this.setCircularArcLength(circularArcLength);
+        this.setListImageUrl(null);
         this.setCircleImagesPoint();
         this.setListCircle();
-        this.timeStep = this.time / this.step;
-        this.inAnimation = false;
+        this.setTimeOfAnimationStep();
+        this.setDefaultMainImagePos();
+    }
 
+    setDefaultMainImagePos() {
         if (this.clockwise == 1) {
             this.mainImagePos = 2
         } else {
@@ -30,6 +26,20 @@ class CircleContainer {
         }
     }
 
+    setListImageUrl(images) {
+        if (images == null) {
+            this.listImagesUrl = [
+                'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4d/Cat_November_2010-1a.jpg/1200px-Cat_November_2010-1a.jpg',
+                'https://www.rd.com/wp-content/uploads/2021/01/GettyImages-1175550351.jpg',
+                'https://upload.wikimedia.org/wikipedia/commons/thumb/9/97/Feral_cat_Virginia_crop.jpg/800px-Feral_cat_Virginia_crop.jpg',
+                'https://media.wired.com/photos/5cdefb92b86e041493d389df/1:1/w_988,h_988,c_limit/Culture-Grumpy-Cat-487386121.jpg',
+                'https://static01.nyt.com/images/2019/10/01/science/00SCI-CATS1/00SCI-CATS1-facebookJumbo.jpg?year=2019&h=549&w=1050&s=a12758d1b750010957f6d8dcafd0fb707ac2f98675c4cd264adc01b93205d41e&k=ZQJBKqZ0VN',
+                'https://thumbor.bigedition.com/funniest-cats-internet/IFuBq6cGzboq-79yUziXTZkYtw0=/0x13:800x614/480x360/filters:format(webp):quality(80)/granite-web-prod/cc/fa/ccfa37b8659442e9a994fe07d0534ac8.jpeg',
+                'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQaPnRaUPvLfZOh83q86MwakewvLW615xkJ8w&usqp=CAU',
+            ];
+        }
+        this.imagesLength = this.listImagesUrl.length;
+    }
     setCircleImagesPoint() {
         this.mainPoint = {
             posX: this.posX - this.r,
@@ -77,7 +87,7 @@ class CircleContainer {
         this.circularArcLength = distance;
     }
     setDefaultClockwise(isClockwise) {
-        this.defaultClockwise = isClockwise ? 1 : -1;;
+        this.defaultClockwise = isClockwise ? 1 : -1;
         this.setClockwise(isClockwise);
     }
     setClockwise(isClockwise) {
@@ -169,11 +179,6 @@ class CircleContainer {
         }
 
     }
-
-    setListImageUrl(listImagesUrl) {
-        this.listImagesUrl = listImagesUrl;
-        this.imagesLength = listImagesUrl.length;
-    }
     changeImageStep(step) {
         this.imageStep = step;
         if (step < 0) {
@@ -216,13 +221,8 @@ class CircleContainer {
         this.setDefaultClockwise(isClockwise);
         this.setAnimationTime(this.defaultTime / numberAbs);
         this.setAnimationStep(Math.floor(this.defaultStep / numberAbs));
-        console.log(this.time, this.step, this.timeStep);
-        // this.startAnimation();
-        // setTimeout(function () {
-        //     this.startAnimation();
-        // }.bind(this), this.time + 15);
+
         for (let i = 0; i < numberAbs; i++) {
-            // console.log(i * this.time);
             setTimeout(function () {
                 this.startAnimation();
             }.bind(this), i * this.time);
@@ -266,31 +266,23 @@ class CircleImage {
     }
 
 }
-let listImagesUrl = [
-    'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4d/Cat_November_2010-1a.jpg/1200px-Cat_November_2010-1a.jpg',
-    'https://www.rd.com/wp-content/uploads/2021/01/GettyImages-1175550351.jpg',
-    'https://upload.wikimedia.org/wikipedia/commons/thumb/9/97/Feral_cat_Virginia_crop.jpg/800px-Feral_cat_Virginia_crop.jpg',
-    'https://media.wired.com/photos/5cdefb92b86e041493d389df/1:1/w_988,h_988,c_limit/Culture-Grumpy-Cat-487386121.jpg',
-    'https://static01.nyt.com/images/2019/10/01/science/00SCI-CATS1/00SCI-CATS1-facebookJumbo.jpg?year=2019&h=549&w=1050&s=a12758d1b750010957f6d8dcafd0fb707ac2f98675c4cd264adc01b93205d41e&k=ZQJBKqZ0VN'
-];
-let circleContainer = new CircleContainer(500, 400, 400, false, listImagesUrl, 0.125);
-circleContainer.setDefaultAnimationTime(500);
-circleContainer.setDefaultAnimationStep(80);
+
+let circleContainer = new CircleContainer(500, 400, 400);
 
 
-const nextBtn = document.getElementById('qqbtn');
-const prevBtn = document.getElementById('qqjztrbtn');
+const nextBtn = document.getElementById('next-btn');
+const prevBtn = document.getElementById('prev-btn');
 
 
 nextBtn.addEventListener('click', function () {
     if (!circleContainer.inAnimation) {
-        circleContainer.rotateNAnimation(-3);
+        circleContainer.rotateNAnimation(-1);
     }
 });
 
 prevBtn.addEventListener('click', function () {
     if (!circleContainer.inAnimation) {
-        circleContainer.rotateNAnimation(3);
+        circleContainer.rotateNAnimation(1);
     }
 });
 

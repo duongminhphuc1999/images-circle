@@ -39,10 +39,10 @@ class CircleContainer {
         this.topPoint = this.pointAfterRotate(this.mainPoint, - rad);
         this.bottomPoint = this.pointAfterRotate(this.mainPoint, rad);
         this.hiddenPoint = this.pointAfterRotate(this.mainPoint, - 2 * rad);
-        this.hiddenBottomPoint = this.pointAfterRotate(this.mainPoint,2* rad);
+        this.hiddenBottomPoint = this.pointAfterRotate(this.mainPoint, 2 * rad);
     }
     setListCircle() {
-       
+
         this.circle1 = new CircleImage('.circle.circle-1', this.hiddenPoint.posX, this.hiddenPoint.posY, 50, this.listImagesUrl[3]);
         this.circle2 = new CircleImage('.circle.circle-2', this.topPoint.posX, this.topPoint.posY, 50, this.listImagesUrl[0]);
         this.circle3 = new CircleImage('.circle.circle-3', this.mainPoint.posX, this.mainPoint.posY, 50, this.listImagesUrl[1]);
@@ -167,6 +167,7 @@ class CircleContainer {
         if (this.hiddenImagePos < -1) {
             this.hiddenImagePos = this.imagesLength - 2
         }
+
     }
 
     setListImageUrl(listImagesUrl) {
@@ -208,25 +209,24 @@ class CircleContainer {
             }
 
         }.bind(this), this.timeStep);
-
     }
     rotateNAnimation(number) {
         let numberAbs = Math.abs(number);
-        let isClockwise = number/numberAbs == -1 ? false : true;
+        let isClockwise = number / numberAbs == -1 ? false : true;
         this.setDefaultClockwise(isClockwise);
-        this.setAnimationTime(this.defaultTime/numberAbs);
-        this.setAnimationStep(this.defaultStep/numberAbs);
-
-        this.startAnimation();
-        if(numberAbs == 1) {
-            return 0;
-        }
-        console.log(numberAbs);
-        for(let i = 2; i <= numberAbs; i++) {
-            setTimeout(function() {
+        this.setAnimationTime(this.defaultTime / numberAbs);
+        this.setAnimationStep(Math.floor(this.defaultStep / numberAbs));
+        console.log(this.time, this.step, this.timeStep);
+        // this.startAnimation();
+        // setTimeout(function () {
+        //     this.startAnimation();
+        // }.bind(this), this.time + 15);
+        for (let i = 0; i < numberAbs; i++) {
+            // console.log(i * this.time);
+            setTimeout(function () {
                 this.startAnimation();
-            }.bind(this), (i - 1) * this.time);
-        } 
+            }.bind(this), i * this.time);
+        }
     }
 }
 class CircleImage {
@@ -275,7 +275,7 @@ let listImagesUrl = [
 ];
 let circleContainer = new CircleContainer(500, 400, 400, false, listImagesUrl, 0.125);
 circleContainer.setDefaultAnimationTime(500);
-circleContainer.setDefaultAnimationStep(100);
+circleContainer.setDefaultAnimationStep(80);
 
 
 const nextBtn = document.getElementById('qqbtn');
@@ -284,13 +284,13 @@ const prevBtn = document.getElementById('qqjztrbtn');
 
 nextBtn.addEventListener('click', function () {
     if (!circleContainer.inAnimation) {
-        circleContainer.rotateNAnimation(-1);
+        circleContainer.rotateNAnimation(-3);
     }
 });
 
 prevBtn.addEventListener('click', function () {
     if (!circleContainer.inAnimation) {
-        circleContainer.rotateNAnimation(1);
+        circleContainer.rotateNAnimation(3);
     }
 });
 
